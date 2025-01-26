@@ -36,6 +36,15 @@ def best_hand(hand):
             
     return best_combo
 
+    '''
+    # ANOTHER WAY TO DO IT
+
+    # Generate all combinations of 5 cards from the 7-card hand
+    all_combos = itertools.combinations(hand, 5)
+    # Evaluate each combination and return the one with the highest rank
+    return max(all_combos, key=hand_rank)
+    '''
+
     pass
     
 # ------------------
