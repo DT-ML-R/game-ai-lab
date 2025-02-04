@@ -11,5 +11,5 @@ if __name__ ==  '__main__':
     run_console_chat(template_file=trader_template_file,
                      recruit_difficulty='not easy',
                      reward='a sword',
-                     sign='Pulin',
+                     sign='Derek',
                      end_regex=r'RECRUIT(.*)DONE')

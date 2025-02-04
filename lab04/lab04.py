@@ -20,7 +20,11 @@ def run_console_chat(sign, **kwargs):
                 print('Ending match:', ending_match)
             break
 
-lab04_params = {}
+lab04_params = {
+    "template_file"
+    "sign"
+    "inventory"
+}
 
 if __name__ ==  '__main__':
     # run lab04.py to test your template interactively
