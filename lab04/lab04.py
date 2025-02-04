@@ -23,6 +23,7 @@ def run_console_chat(sign, **kwargs):
 lab04_params = {
     "template_file"
     "sign"
+    "end_regex"
     "inventory"
 }
 
