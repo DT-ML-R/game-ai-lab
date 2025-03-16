@@ -28,16 +28,12 @@ def process_response(self, response):
     add the tool's response as a new message, and return the updated response.
     """
     if response.message.tool_calls:
-        for tool_call in response.message.tool_calls:
-            # Process the tool call and get the result from the corresponding function
-            result = process_function_call(tool_call.function)
-            # Append the tool's result to the conversation history
-            self.messages.append({
-                'role': 'tool',
-                'name': tool_call.function.name,
-                'arguments': tool_call.function.arguments,
-                'content': result
-            })
+        self.messages.append({
+            'role': 'tool',
+            'name': response.message.tool_calls[0].function.name,
+            'arguments': response.message.tool_calls[0].function.arguments,
+            'content': process_function_call(response.message.tool_calls[0].function)
+        })
         # Generate a new response based on the updated conversation
         return self.completion()
     return response
