@@ -20,12 +20,6 @@ import numpy as np
 # Utility imports
 import pandas as pd
 
-# Update the data directory path
-DATA_DIR = "data"  # Instead of "lab08/data"
-
-print(f"Current working directory: {os.getcwd()}")
-print(f"Data directory exists: {os.path.exists('data')}")
-print(f"Files in data directory: {os.listdir('data') if os.path.exists('data') else 'Directory not found'}")
 
 class OllamaEmbeddingFunction:
     """Custom embedding function that uses Ollama for embeddings"""
@@ -36,22 +30,12 @@ class OllamaEmbeddingFunction:
     def __call__(self, input: List[str]) -> List[List[float]]:
         """Generate embeddings for a list of texts using Ollama"""
         embeddings = []
-        
-        # Use llama3.2 which requires less memory
-        self.model_name = "llama3.2"
-        print(f"Using {self.model_name} for embeddings...")
-        
         for text in input:
-            try:
-                response = ollama.embeddings(model=self.model_name, prompt=text)
-                embeddings.append(response['embedding'])
-            except Exception as e:
-                print(f"Error generating embedding: {e}")
-                if "model not found" in str(e).lower():
-                    print(f"Please ensure {self.model_name} is available in Ollama")
-                raise
-            
+            response = ollama.embeddings(model=self.model_name, prompt=text)
+            embeddings.append(response['embedding'])
         return embeddings
+        
+        pass
 
 
 def load_documents(data_dir: str) -> Dict[str, str]:
@@ -59,12 +43,20 @@ def load_documents(data_dir: str) -> Dict[str, str]:
     Load text documents from a directory
     """
     documents = {}
-    for file_path in glob.glob(os.path.join(data_dir, "*.txt")):
+    # Print the full path being searched
+    search_path = os.path.join(data_dir, "*.txt")
+    print(f"Searching for documents in: {search_path}")
+    
+    for file_path in glob.glob(search_path):
+        print(f"Found file: {file_path}")
         with open(file_path, 'r') as file:
             content = file.read()
             documents[os.path.basename(file_path)] = content
     
-    print(f"Loaded {len(documents)} documents from {data_dir}")
+    if not documents:
+        print("No documents found! Please check if the data directory contains .txt files")
+    else:
+        print(f"Loaded {len(documents)} documents from {data_dir}")
     return documents
 
 
@@ -138,18 +130,25 @@ def retrieve_context(collection: chromadb.Collection, query: str, n_results: int
     """
     Retrieve relevant context from ChromaDB based on the query
     """
+    
+    # Query the collection for similar documents
     results = collection.query(
         query_texts=[query],
         n_results=n_results
     )
     
-    # Make sure we're returning a list of strings
-    # The documents are in results['documents'][0] because query_texts was a list with one item
-    if results and 'documents' in results and results['documents']:
-        return results['documents'][0]  # This returns the list of documents
+    # Return the retrieved documents
+    return results['documents'][0]
     
-    # Return empty list if no results found
-    return []
+    '''
+    results = collection.query(
+        query_texts=[query],
+        n_results=n_results
+    )
+    return results.get('documents')
+    '''
+
+    pass
 
 
 
@@ -205,11 +204,11 @@ def main():
     """
     
     # Set embedding and LLM models
-    embedding_model = "nomic-embed-text"  # Change to your preferred embedding model
-    llm_model = "llama3.2:latest"  # Change to your preferred LLM model
+    embedding_model = "nomic-embed-text"  # Keep original
+    llm_model = "llama3.2:latest"  # Keep original
     
     # 1. Load documents
-    data_dir = DATA_DIR
+    data_dir = "data"  # Changed from "lab08/data" to just "data"
     documents = load_documents(data_dir)
     
     # 2. Chunk documents using ChromaDB chunker
